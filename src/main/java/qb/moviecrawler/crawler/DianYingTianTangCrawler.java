@@ -50,19 +50,28 @@ public class DianYingTianTangCrawler implements PageProcessor {
            } else { //如果符合详情页正则读取电影标题 及 分类
                //电影名
                String title = page.getHtml().xpath("//div[@class='co_area2']/div/h1/font/text()").get();
+               //内容
                String content = page.getHtml().xpath("//div[@id='Zoom']/span/p").get();
-               String link = page.getHtml().xpath("//div[@id='Zoom']/span/table/tbody/tr/td/a").get();
-               Document document = page.getHtml().getDocument();
-               Elements elements = document.select("a");
-               for (Element element : elements) {
-                   //抓取到URL
-                   String movieURL = element.attr("abs:href");
-                   //提取到有用的的URL
-                   if (movieURL.contains("thread") && movieURL.contains("html") && !movieURL.contains("83494")) {
-                       //将抓取到的URL添加到List中
-                       System.out.println(movieURL);
-                   }
-               }
+               //下载连接
+               String link = page.getHtml().xpath("//div[@id='Zoom']/span/table/tbody/tr/td/a").links().get();
+
+               String year = CommonUtil.parseProperty(content, "◎年　　代");
+               String country = CommonUtil.parseProperty(content, "◎产　　地");
+               String type = CommonUtil.parseProperty(content, "◎类　　别");
+               String subtitle = CommonUtil.parseProperty(content, "◎字　　幕");
+               String filmLength = CommonUtil.parseProperty(content, "◎片　　长");
+               String director = CommonUtil.parseProperty(content, "◎导　　演");
+               String actorRegix = "◎主　　演";
+               String actor = content.substring(content.indexOf(actorRegix) + actorRegix.length() + 1, content.indexOf("◎简　　介"));
+               System.out.println(actor.trim());
+               String absRegix = "◎简　　介";
+               String abs = content.substring(content.indexOf(absRegix) + absRegix.length() + 1, content.indexOf("</p>"));
+               System.out.println(abs.trim());
+
+               String[] imgs = CommonUtil.readElements(content, "img", "src");
+               System.out.println("封面："+imgs[0]);
+               System.out.println("截图"+imgs[1]);
+
                System.out.println(CommonUtil.getMovieName(title));
                System.out.println(content);
                System.out.println(link);

@@ -3,6 +3,7 @@ package qb.moviecrawler.common;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import qb.moviecrawler.database.model.Agency;
 import qb.moviecrawler.database.repository.AgencyRepository;
@@ -43,6 +44,23 @@ public class CommonUtil {
     }
 
     /**
+     * 功能描述：读取文本标签属性
+     * @author qiaobin
+     * @param document 解析文本
+     * @param cssQuery 标签名称
+     * @param attr 解析属性
+     */
+    public final static String[] readElements(String document, String cssQuery, String attr) {
+        Document doc = Jsoup.parse(document);
+        Elements elements=doc.select(cssQuery);
+        String[] arrs = new String[elements.size()];
+        for (int i = 0; i < elements.size(); i++) {
+            arrs[i] = elements.get(i).attr(attr);
+        }
+        return arrs;
+    }
+
+    /**
      * 功能描述：设置代理
      * @author qiaobin
      * @param agencies
@@ -71,5 +89,16 @@ public class CommonUtil {
         if (m.find())
             return m.group().replaceAll("《", "").replaceAll("》", "");
         else return "";
+    }
+
+    /**
+     * 功能描述：从文章内容解析出电影属性
+     * @author qiaobin
+     * @param
+     */
+    public final static String parseProperty(String content, String property) {
+        String temp = content.substring(content.indexOf(property));
+        temp = temp.substring(property.length(), temp.indexOf("<br>"));
+        return temp.trim();
     }
 }
