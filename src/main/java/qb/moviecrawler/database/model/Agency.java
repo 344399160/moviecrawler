@@ -22,7 +22,6 @@ public class Agency implements Serializable{
      */
     @Id
     @Column(name="`IP`")
-    @Getter
     private String ip;
 
     /**

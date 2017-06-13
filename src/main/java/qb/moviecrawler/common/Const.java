@@ -21,5 +21,6 @@ public class Const {
     //电影天堂主页
     public final static String MAINPAGE = "http://www.ygdy8.net";
     //详情页匹配正则
-    public final static String DETAIL_PAGE_REGIX = "html/gndy/jddy/[0-9]+/[0-9]+.html";
+    public final static String DETAIL_PAGE_REGIX = "html/[a-z]*/[a-z]*/[0-9]+/[0-9]+.html";
+
 }

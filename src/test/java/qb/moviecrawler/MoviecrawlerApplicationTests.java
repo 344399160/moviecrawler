@@ -1,6 +1,8 @@
 package qb.moviecrawler;
 
 import org.junit.Test;
+import qb.moviecrawler.common.CheckIPUtils;
+import qb.moviecrawler.common.UserAgentUtils;
 
 import java.lang.annotation.Target;
 import java.util.regex.Matcher;
@@ -12,10 +14,7 @@ public class MoviecrawlerApplicationTests {
 
     @Test
     public void test() {
-        String title = "2016年动作《超级强盗》BD中文字幕";
-        Pattern p = Pattern.compile("《([^》]+)》");
-        Matcher m = p.matcher(title);
-        if (m.find())
-        System.out.println(m.group());
+        boolean flag = CheckIPUtils.checkValidIP("118.178.86.181", 80);
+        System.out.println(flag);
     }
 }
