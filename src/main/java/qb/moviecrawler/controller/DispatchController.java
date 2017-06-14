@@ -21,7 +21,7 @@ public class DispatchController {
      * 功能描述：爬取代理信息
      * @author qiaobin
      */
-    @RequestMapping(value = "/grapAgencies")
+    @RequestMapping(value = "/grapagencies")
     public String saveTag(){
         dispatchService.grapAgencies();
         return "success";

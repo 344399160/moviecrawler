@@ -4,8 +4,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import qb.moviecrawler.common.CheckIPUtils;
 import qb.moviecrawler.common.CommonUtil;
 import qb.moviecrawler.common.Const;
+import qb.moviecrawler.common.UserAgentUtils;
 import qb.moviecrawler.database.model.Agency;
 import qb.moviecrawler.database.repository.AgencyRepository;
 import us.codecraft.webmagic.Page;
@@ -29,12 +31,12 @@ public class WuYouAgencyCrawler implements PageProcessor {
     }
 
     private Site site = Site.me().setRetryTimes(3).setSleepTime(1000)
-            .addHeader("User-Agent", Const.HEADER);
+            .setUserAgent(UserAgentUtils.radomUserAgent());
 
     @Override
     public void process(Page page) {
+
         List<String> all = page.getHtml().xpath(Const.WUYOU_AGENCIES_XPATH).all();
-        List<Agency> agencies = new ArrayList<>(20);
         for (String s : all) {
             Document doc = Jsoup.parse(s);
             Elements elements = doc.select("span");
@@ -44,17 +46,20 @@ public class WuYouAgencyCrawler implements PageProcessor {
             String type = CommonUtil.defaultValue(elements.get(3).child(0).child(0).text());
             String country = CommonUtil.defaultValue(elements.get(4).child(0).child(0).text());
             String operator = CommonUtil.defaultValue(elements.get(6).child(0).child(0).text());
-
-            Agency agency = new Agency();
-            agency.setIp(ip);
-            agency.setPort(port);
-            agency.setAnonymityDegree(anonymityDegree);
-            agency.setType(type);
-            agency.setCountry(country);
-            agency.setOperator(operator);
-            agencies.add(agency);
+            if (country.equals("中国")) {
+                System.out.println(ip + ":" + Integer.parseInt(port));
+                if (CheckIPUtils.checkValidIP(ip, Integer.parseInt(port))) {
+                    Agency agency = new Agency();
+                    agency.setIp(ip);
+                    agency.setPort(port);
+                    agency.setAnonymityDegree(anonymityDegree);
+                    agency.setType(type);
+                    agency.setCountry(country);
+                    agency.setOperator(operator);
+                    agencyRepository.save(agency);
+                }
+            }
         }
-        agencyRepository.save(agencies);
     }
 
     @Override

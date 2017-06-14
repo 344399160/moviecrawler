@@ -137,7 +137,7 @@ public class CommonUtil {
         try {
             String temp = content.substring(content.indexOf(property));
             temp = temp.substring(property.length(), temp.indexOf("<br>"));
-            return temp.trim();
+            return temp.trim().replace("　", "");
         } catch (Exception e) {
             return "";
         }

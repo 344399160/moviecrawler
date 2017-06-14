@@ -11,11 +11,15 @@ import qb.moviecrawler.common.EnumConst;
 import qb.moviecrawler.common.UserAgentUtils;
 import qb.moviecrawler.database.model.Movie;
 import qb.moviecrawler.database.repository.MovieRepository;
+import qb.moviecrawler.database.util.jpa.Criteria;
+import qb.moviecrawler.database.util.jpa.Restrictions;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,6 +35,8 @@ public class DianYingTianTangCrawler implements PageProcessor {
     //电影分类
     private String classify;
 
+    private int count;
+
     public DianYingTianTangCrawler(MovieRepository movieRepository, String classify) {
         this.movieRepository = movieRepository;
         this.classify = classify;
@@ -44,6 +50,7 @@ public class DianYingTianTangCrawler implements PageProcessor {
     public void process(Page page) {
         //第一次进入只添加分页链接
        if (index == 0) {
+           count = this.getClassifyCount();
            enterPage = page.getUrl().all().get(0);
            enterPage = enterPage.replace("index.html", "");
            //获取分页html名称
@@ -53,7 +60,6 @@ public class DianYingTianTangCrawler implements PageProcessor {
            }).collect(Collectors.toList());
            //添加分页链接
            page.addTargetRequests(pageLinks);
-//           page.addTargetRequest(pageLinks.get(0));
        } else {
            if (!page.getUrl().regex(Const.DETAIL_PAGE_REGIX).match()) { //如果不符合详情页正则添加电影标题连接
                List<String> titleLinks = page.getHtml().xpath(Const.MOVIE_LINKS).links().all();
@@ -81,6 +87,8 @@ public class DianYingTianTangCrawler implements PageProcessor {
                String filmLength = CommonUtil.parseProperty(content, "◎片　　长");
                //导演
                String director = CommonUtil.parseProperty(content, "◎导　　演");
+               //上映日期
+               String releaseDate = CommonUtil.parseProperty(content, "◎上映日期");
                //主演
                String actor = null;
                try {
@@ -101,7 +109,39 @@ public class DianYingTianTangCrawler implements PageProcessor {
                }
                //图片
                String[] imgs = CommonUtil.readElements(content, "img", "src");
-               movie.setId(UUID.randomUUID().toString());
+               if (null != imgs) {
+                   if (imgs.length >= 2) {
+                       movie.setCoverImg(imgs[0]);
+                       List<String> list = new ArrayList<>();
+                       for (int i = 1; i < imgs.length; i++) {
+                           list.add(imgs[i]);
+                       }
+                       movie.setScreenshotImg(StringUtils.join(list, ";"));
+                   } else if (imgs.length == 1){
+                       String jianjie = "◎简　　介";
+                       String temp = content.substring(content.indexOf(jianjie) + jianjie.length(), content.length());
+                       if (temp.indexOf("<img") == -1) {
+                           movie.setCoverImg(imgs[0]);
+                       } else {
+                           movie.setScreenshotImg(imgs[0]);
+                       }
+                   }
+               }
+               if (count > 0) {
+                   //更新
+                   Criteria<Movie> criteria = new Criteria<>();
+                   criteria.add(Restrictions.eq("name", CommonUtil.getMovieName(title)));
+                   Movie one = movieRepository.findOne(criteria);
+                   if (null != one) {
+                       movie.setId(one.getId());
+                       movie.setFirstTime(one.getFirstTime());
+                       movie.setLastTime(new Date());
+                   }
+               } else {
+                   movie.setFirstTime(new Date());
+                   movie.setLastTime(new Date());
+                   movie.setId(UUID.randomUUID().toString());
+               }
                movie.setName(CommonUtil.getMovieName(title));
                movie.setYear(year.replace("　",""));
                movie.setCountry(country.replace("　",""));
@@ -110,21 +150,31 @@ public class DianYingTianTangCrawler implements PageProcessor {
                movie.setFilmLength(filmLength.replace("　",""));
                movie.setDirector(director.replace("　",""));
                movie.setActor(actor.replace("　",""));
-               movie.setCoverImg(imgs[0]);
-               movie.setScreenshotImg(imgs[1]);
                movie.setLinks(link);
                movie.setAbs(abs);
                movie.setClassify(EnumConst.CLASSIFY.get(classify).getNAME());
+               movie.setReleaseDate(releaseDate.replace("　",""));
                movieRepository.save(movie);
            }
         }
         index++;
     }
 
+    private int getClassifyCount() {
+        try {
+            Criteria<Movie> criteria = new Criteria<>();
+            criteria.add(Restrictions.eq("classify", EnumConst.CLASSIFY.get(classify).NAME));
+            int count = movieRepository.findAll(criteria).size();
+            return count;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     @Override
     public Site getSite() {
-        Site site = Site.me().setTimeOut(6000).setRetryTimes(3)
-                .setSleepTime(1000)
+        Site site = Site.me().setTimeOut(10000).setRetryTimes(3)
+                .setSleepTime(1000).setCharset("gb2312")
                 .setUserAgent(UserAgentUtils.radomUserAgent());
         return site;
     }

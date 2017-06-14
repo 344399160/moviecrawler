@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * 功能：电影实体
@@ -30,7 +31,7 @@ public class Movie {
     /**
      *  年代
      */
-    @Column(name="`YEAR`", length = 10)
+    @Column(name="`YEAR`", length = 50)
     private String year;
 
     /**
@@ -60,13 +61,13 @@ public class Movie {
     /**
      *  片长
      */
-    @Column(name="`FILM_LENGTH`", length = 30)
+    @Column(name="`FILM_LENGTH`", length = 100)
     private String filmLength;
 
     /**
      *  主演
      */
-    @Column(name="`ACTOR`", length = 5000)
+    @Column(name="`ACTOR`", length = 10000)
     private String actor;
 
     /**
@@ -74,6 +75,12 @@ public class Movie {
      */
     @Column(name="`DIRECTOR`", length = 100)
     private String director;
+
+    /**
+     *  上映日期
+     */
+    @Column(name="`RELEASEDATE`", length = 100)
+    private String releaseDate;
 
     /**
      *  简介
@@ -100,6 +107,18 @@ public class Movie {
     @Column(name="`LINKS`")
     @Lob
     private String links;
+
+    /**
+     *  第一次入库时间
+     */
+    @Column(name="`FIRSTTIME`")
+    private Date firstTime;
+
+    /**
+     *  最后一次入库时间
+     */
+    @Column(name="`LASTTIME`")
+    private Date lastTime;
 
 
 }

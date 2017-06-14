@@ -14,7 +14,8 @@ public class MoviecrawlerApplicationTests {
 
     @Test
     public void test() {
-        boolean flag = CheckIPUtils.checkValidIP("118.178.86.181", 80);
-        System.out.println(flag);
+        //116.226.101.93 9999
+//        System.out.println(CheckIPUtils.checkValidIP("116.226.101.93", Integer.parseInt("9999")));
+        System.out.println(CheckIPUtils.checkValidIP("60.178.87.240", Integer.parseInt("8080")));
     }
 }
