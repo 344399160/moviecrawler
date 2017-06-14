@@ -55,7 +55,7 @@ public class Movie {
     /**
      *  字幕
      */
-    @Column(name="`SUBTITLE`", length = 50)
+    @Column(name="`SUBTITLE`", length = 200)
     private String subtitle;
 
     /**
@@ -98,7 +98,7 @@ public class Movie {
     /**
      *  截图
      */
-    @Column(name="`SCREENSHOT_IMG`", length = 200)
+    @Column(name="`SCREENSHOT_IMG`", length = 5000)
     private String screenshotImg;
 
     /**

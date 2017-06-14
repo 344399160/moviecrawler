@@ -143,17 +143,17 @@ public class DianYingTianTangCrawler implements PageProcessor {
                    movie.setId(UUID.randomUUID().toString());
                }
                movie.setName(CommonUtil.getMovieName(title));
-               movie.setYear(year.replace("　",""));
-               movie.setCountry(country.replace("　",""));
-               movie.setType(type.replace("　",""));
-               movie.setSubtitle(subtitle.replace("　",""));
-               movie.setFilmLength(filmLength.replace("　",""));
-               movie.setDirector(director.replace("　",""));
-               movie.setActor(actor.replace("　",""));
+               movie.setYear(year);
+               movie.setCountry(country);
+               movie.setType(type);
+               movie.setSubtitle(subtitle);
+               movie.setFilmLength(filmLength);
+               movie.setDirector(director);
+               movie.setActor(actor);
                movie.setLinks(link);
                movie.setAbs(abs);
                movie.setClassify(EnumConst.CLASSIFY.get(classify).getNAME());
-               movie.setReleaseDate(releaseDate.replace("　",""));
+               movie.setReleaseDate(releaseDate);
                movieRepository.save(movie);
            }
         }
