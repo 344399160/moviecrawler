@@ -1,21 +1,44 @@
 package qb.moviecrawler;
 
+import javafx.application.Application;
 import org.junit.Test;
-import qb.moviecrawler.common.CheckIPUtils;
-import qb.moviecrawler.common.UserAgentUtils;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import qb.moviecrawler.database.model.DownloadLink;
+import qb.moviecrawler.database.model.Movie;
+import qb.moviecrawler.database.repository.MovieRepository;
 
-import java.lang.annotation.Target;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = MoviecrawlerApplication.class)
+@WebAppConfiguration
 public class MoviecrawlerApplicationTests {
 
-
+    @Autowired
+    private MovieRepository movieRepository;
 
     @Test
     public void test() {
-        //116.226.101.93 9999
-//        System.out.println(CheckIPUtils.checkValidIP("116.226.101.93", Integer.parseInt("9999")));
-        System.out.println(CheckIPUtils.checkValidIP("60.178.87.240", Integer.parseInt("8080")));
+        Movie movie = new Movie();
+        movie.setId("1");
+        movie.setName("name");
+
+        List<DownloadLink> list = new ArrayList<>();
+        DownloadLink l1 = new DownloadLink();
+        l1.setLink("link");
+        l1.setId("abc");
+//        l1.setMovieId("1");
+        list.add(l1);
+        movie.setLinks(list);
+        movieRepository.save(movie);
     }
+
+
+
 }

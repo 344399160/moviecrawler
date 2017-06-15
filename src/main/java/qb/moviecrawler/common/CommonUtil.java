@@ -11,6 +11,12 @@ import us.codecraft.webmagic.downloader.HttpClientDownloader;
 import us.codecraft.webmagic.proxy.Proxy;
 import us.codecraft.webmagic.proxy.SimpleProxyProvider;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -133,13 +139,54 @@ public class CommonUtil {
      * @author qiaobin
      * @param
      */
-    public static String parseProperty(String content, String property) {
+    public static String parseProperty(String content, String property, String end) {
         try {
             String temp = content.substring(content.indexOf(property));
-            temp = temp.substring(property.length(), temp.indexOf("<br>"));
+            temp = temp.substring(property.length(), temp.indexOf(end));
             return temp.trim().replace("　", "");
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    /**
+     * 功能描述：获取日志路径
+     * @author qiaobin
+     * @param
+     */
+    public static String getLogName() {
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String formatDate = sdf.format(date);
+        String path = String.format("moviecrawler.%s.log", formatDate);
+        return path;
+    }
+
+    /**
+     * 功能描述：将日志中失败的连接提出
+     * @author qiaobin
+     * @param
+     */
+    public static String[] parseLog(File file) {
+        try {
+            List<String> list = new ArrayList<>();
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                Pattern p = Pattern.compile("(http):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?");
+                Matcher m = p.matcher(line);
+                if (m.find()) {
+                    list.add(m.group());
+                }
+            }
+            br.close();
+            if (list.size() > 0) {
+                return list.toArray(new String[list.size()]);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            return null;
         }
     }
 }

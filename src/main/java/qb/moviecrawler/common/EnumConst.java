@@ -12,13 +12,13 @@ public interface EnumConst {
     enum CLASSIFY{
         OUMEIMOVIE("欧美电影", 1),
         GUONEIMOVIE("国内电影", 2),
-        RIHANMOVIE("日韩电影", 2),
-        JINGDIANMOVIE("经典电影", 3),
-        HUAYUTV("华语电视", 4),
-        RIHANTV("日韩电视", 5),
-        OUMEITV("欧美电视", 6),
-        LATESTVARIETY("最新综艺", 7),
-        CARTOON("动漫", 8);
+        RIHANMOVIE("日韩电影", 3),
+        OTHERMOVIE("日韩电影", 4),
+        HUAYUTV("华语电视", 5),
+        RIHANTV("日韩电视", 6),
+        OUMEITV("欧美电视", 7),
+        LATESTVARIETY("最新综艺", 8),
+        CARTOON("动漫", 9);
 
         public final String ID;
         public final int NAME;

@@ -11,7 +11,7 @@
         <rollingPolicy
                 class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>
-                F:/moviecrawler.%d{yyyy-MM-dd}.log
+                moviecrawler.%d{yyyy-MM-dd}.log
             </FileNamePattern>
             <!-- keep 60 days worth of history -->
             <MaxHistory>60</MaxHistory>

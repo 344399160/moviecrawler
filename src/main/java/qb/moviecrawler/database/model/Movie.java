@@ -1,10 +1,12 @@
 package qb.moviecrawler.database.model;
 
 import lombok.Data;
-import lombok.Getter;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 功能：电影实体
@@ -13,7 +15,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "`MOVIE`")
-public class Movie {
+public class Movie implements java.io.Serializable {
 
     /**
      *  主键
@@ -104,9 +106,16 @@ public class Movie {
     /**
      *  下载地址
      */
-    @Column(name="`LINKS`")
-    @Lob
-    private String links;
+    @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+    @JoinColumn(name="MOVIE_ID")
+    private List<DownloadLink> links;
+
+
+    /**
+     *  原地址
+     */
+    @Column(name="`SOURCE_URL`",length = 255)
+    private String sourceURL;
 
     /**
      *  第一次入库时间
