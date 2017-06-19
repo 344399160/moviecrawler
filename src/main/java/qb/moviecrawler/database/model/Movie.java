@@ -110,6 +110,12 @@ public class Movie implements java.io.Serializable {
     private String coverImg;
 
     /**
+     *  评分
+     */
+    @Column(name="`SCORE`", length = 50)
+    private String score ;
+
+   /**
      *  截图
      */
     @Column(name="`SCREENSHOT_IMG`", length = 5000)
