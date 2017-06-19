@@ -48,10 +48,10 @@ public class DownloadLink implements java.io.Serializable{
     @Column(name="`FIRST_DATE`")
     private Date firstDate;
 
-//    /**
-//     * 电影ID
-//     */
-//    @Column(name = "`MOVIE_ID`")
-//    private String movieId;
+    /**
+     * 格式 （平板、TV、手机）
+     */
+    @Column(name = "`TYPE`")
+    private String type;
 
 }

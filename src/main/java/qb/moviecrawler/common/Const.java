@@ -49,5 +49,6 @@ public class Const {
 //        DIANYINGTIANTANG_MAP.put(EnumConst.CLASSIFY.CARTOON.ID, "http://www.dytt8.net/html/dongman/index.html");   //动漫
     }
 
-
+    //-------------80s-------------
+    public final static String EIGHTS_LAST_PAGE_XPATH = "//div[@class='pager']/a[6]";
 }

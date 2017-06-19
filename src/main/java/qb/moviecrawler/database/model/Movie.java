@@ -67,6 +67,12 @@ public class Movie implements java.io.Serializable {
     private String filmLength;
 
     /**
+     *  评分
+     */
+    @Column(name="`SCORE`")
+    private double score;
+
+    /**
      *  主演
      */
     @Column(name="`ACTOR`", length = 10000)
@@ -83,6 +89,12 @@ public class Movie implements java.io.Serializable {
      */
     @Column(name="`RELEASEDATE`", length = 100)
     private String releaseDate;
+
+    /**
+     *  概述
+     */
+    @Column(name="`INTRODUCE`")
+    private String introduce;
 
     /**
      *  简介
@@ -109,6 +121,13 @@ public class Movie implements java.io.Serializable {
     @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
     @JoinColumn(name="MOVIE_ID")
     private List<DownloadLink> links;
+
+    /**
+     *  下载地址
+     */
+    @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+    @JoinColumn(name="COMMENT_ID")
+    private List<Comment> comments;
 
 
     /**
