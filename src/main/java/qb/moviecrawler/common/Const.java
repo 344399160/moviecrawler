@@ -50,5 +50,20 @@ public class Const {
     }
 
     //-------------80s-------------
-    public final static String EIGHTS_LAST_PAGE_XPATH = "//div[@class='pager']/a[6]";
+    public final static String EIGHTS_LAST_PAGE_XPATH = "//div[@class='pager']/a[6]";  //分页最后一页数
+    public final static String EIGHTS_PAGE_REGIX = "http://www.80s.tw/movie/list/-----p[0-9]+";  //匹配分页链接正则
+    public final static String EIGHTS_PAGE_LINKS_XPATH = "//div[@class='clearfix noborder block1']/ul[2]/li/a";  //每页所有电影链接
+    public final static String EIGHTS_MOVIE_TITLE_XPATH = "//div[@class='info']/h1/text()";  //电影名称
+    public final static String EIGHTS_COVER_IMG_XPATH = "//div[@id='minfo']/div/img/@src";  //封面图片
+    public final static String EIGHTS_DESCRIBE_XPATH = "//div[@class='info']/span[1]/text()";  //概述
+    public final static String EIGHTS_ALIAS_XPATH = "//div[@class='info']/span[2]/text()";  //别名
+    public final static String EIGHTS_ACTOR_XPATH = "//div[@class='info']/span[3]/a/text()";  //主演
+    public final static String EIGHTS_TYPE_XPATH = "//div[@class='clearfix']/span[1]/a/text()";  //类型
+    public final static String EIGHTS_AREA_XPATH = "//div[@class='clearfix']/span[2]/a/text()";  //地区
+    public final static String EIGHTS_DIRECTOR_XPATH = "//div[@class='clearfix']/span[4]/a/text()";  //导演
+    public final static String EIGHTS_RELEASEDATE_XPATH = "//div[@class='clearfix']/span[5]/text()";  //上映时间
+    public final static String EIGHTS_FILMLENGTH_XPATH = "//div[@class='clearfix']/span[6]/text()";  //片长
+    public final static String EIGHTS_SCORE_XPATH = "//div[@class='clearfix'][2]/span[1]/text()";  //评分
+    public final static String EIGHTS_CONTENT_XPATH = "//div[@id='movie_content']/text()";  //评分
+    public final static String EIGHTS_SCREENSHOT_IMG_XPATH = "//div[@class='noborder block1']/img/@src";  //评分
 }

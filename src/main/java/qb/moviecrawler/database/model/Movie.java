@@ -109,12 +109,6 @@ public class Movie implements java.io.Serializable {
     @Column(name="`COVER_IMG`", length = 200)
     private String coverImg;
 
-    /**
-     *  评分
-     */
-    @Column(name="`SCORE`", length = 50)
-    private String score ;
-
    /**
      *  截图
      */
@@ -129,7 +123,7 @@ public class Movie implements java.io.Serializable {
     private List<DownloadLink> links;
 
     /**
-     *  下载地址
+     *  评论
      */
     @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
     @JoinColumn(name="COMMENT_ID")

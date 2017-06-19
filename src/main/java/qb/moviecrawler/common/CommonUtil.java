@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import qb.moviecrawler.database.model.Agency;
 import qb.moviecrawler.database.repository.AgencyRepository;
+import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.downloader.HttpClientDownloader;
 import us.codecraft.webmagic.proxy.Proxy;
 import us.codecraft.webmagic.proxy.SimpleProxyProvider;
@@ -133,6 +134,28 @@ public class CommonUtil {
             return "";
         }
     }
+
+    /**
+     * 功能描述：根据xpath查询符合条件列表
+     */
+    public final static List<String> getLinksList(Page page, String xpath) {
+        return page.getHtml().xpath(xpath).links().all();
+    }
+
+    /**
+     * 功能描述：根据xpath查询值
+     */
+    public final static String getValue(Page page, String xpath) {
+        return page.getHtml().xpath(xpath).get().trim();
+    }
+
+    /**
+     * 功能描述：根据xpath查询值
+     */
+    public final static List<String> getValues(Page page, String xpath) {
+        return page.getHtml().xpath(xpath).all();
+    }
+
 
     /**
      * 功能描述：从文章内容解析出电影属性
