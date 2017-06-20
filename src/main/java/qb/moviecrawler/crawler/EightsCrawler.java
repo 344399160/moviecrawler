@@ -1,17 +1,22 @@
 package qb.moviecrawler.crawler;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import qb.moviecrawler.common.CommonUtil;
 import qb.moviecrawler.common.Const;
 import qb.moviecrawler.common.UserAgentUtils;
+import qb.moviecrawler.database.model.Comment;
+import qb.moviecrawler.database.model.DownloadLink;
 import qb.moviecrawler.database.model.Movie;
+import qb.moviecrawler.database.repository.DownloadLinkRepository;
+import qb.moviecrawler.database.repository.MovieRepository;
+import qb.moviecrawler.database.util.jpa.Criteria;
+import qb.moviecrawler.database.util.jpa.Restrictions;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
-import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -24,11 +29,22 @@ public class EightsCrawler implements PageProcessor {
 
     private String mainPage = "http://www.80s.tw";
 
-    private int index = 0;
+    private MovieRepository movieRepository;
+
+    private DownloadLinkRepository downloadLinkRepository;
+
+    //爬取类型（grap 抓取， regrap 错误链接重新爬取）
+    private String grapType;
+
+    public EightsCrawler(MovieRepository movieRepository, DownloadLinkRepository downloadLinkRepository, String grapType) {
+        this.movieRepository = movieRepository;
+        this.grapType = grapType;
+        this.downloadLinkRepository = downloadLinkRepository;
+    }
 
     @Override
     public void process(Page page) {
-        if (index == 0) {
+        if (page.getUrl().get().equals(movieMainPage)) {
             List<String> pageLinks = new ArrayList<>();
             String lastPagePath = page.getHtml().xpath(Const.EIGHTS_LAST_PAGE_XPATH).links().get();
             int lastPage = Integer.parseInt(lastPagePath.substring(lastPagePath.lastIndexOf("p") + 1, lastPagePath.length()));
@@ -45,10 +61,36 @@ public class EightsCrawler implements PageProcessor {
                 }).collect(Collectors.toList());
                 page.addTargetRequests(titleLinks);
             } else { //详情页
-                parseContent(page);
+                Movie movie = parseContent(page);
+                Movie savedMoive = this.existMovie(movie.getName());
+                if (null != savedMoive && !CollectionUtils.isEmpty(movie.getLinks())) {   //如果有记录存在， 比较下载链接，如果不存在新链接则保存
+                    List<DownloadLink> oldLinks = savedMoive.getLinks();
+                    List<DownloadLink> links = movie.getLinks();
+                    List<DownloadLink> combineList = new ArrayList<>();
+                    if (CollectionUtils.isEmpty(oldLinks)) {
+                        savedMoive.setLinks(links);
+                        savedMoive.setLastTime(new Date());
+                        movieRepository.save(savedMoive);
+                    }
+                    if (!CollectionUtils.isEmpty(oldLinks)) {
+                        //查询库里相同id记录是否有该link
+                        for (DownloadLink link : links) {
+                            if (downloadLinkRepository.linkExist(link.getLink(), savedMoive.getId()) <= 0) {
+                                combineList.add(link);
+                            }
+                        }
+                        if (combineList.size() > 0) {
+                            combineList.addAll(oldLinks);
+                            savedMoive.setLinks(combineList);
+                            savedMoive.setLastTime(new Date());
+                            movieRepository.save(savedMoive);
+                        }
+                    }
+                } else {
+                    movieRepository.save(movie);
+                }
             }
         }
-        index++;
     }
 
     private Movie parseContent(Page page) {
@@ -87,7 +129,46 @@ public class EightsCrawler implements PageProcessor {
         //内容
         String content = CommonUtil.getValue(page, Const.EIGHTS_CONTENT_XPATH);
 
+        movie.setFirstTime(new Date());
+        movie.setLastTime(new Date());
+        movie.setId(UUID.randomUUID().toString());
+        movie.setName(title);
+        movie.setSourceURL(page.getUrl().get());
+        movie.setYear(releaseDate.substring(0, releaseDate.indexOf("-")));
+        movie.setReleaseDate(releaseDate);
+        movie.setCountry(country);
+        movie.setType(type);
+        movie.setFilmLength(filmLength);
+        movie.setDirector(director);
+        movie.setActor(StringUtils.join(actors, ","));
+        movie.setAbs(content);
+        movie.setScore(score);
+        movie.setCoverImg(coverImg);
+        movie.setScreenshotImg(screenShotImg);
+        movie.setIntroduce(describe);
+        //------------
+        List<DownloadLink> list = new ArrayList<>();
+        DownloadLink link = new DownloadLink();
+        link.setId(UUID.randomUUID().toString());
+        link.setLink("www.baidu.com");
+        link.setFirstDate(new Date());
+        list.add(link);
+        movie.setLinks(list);
+
+        List<Comment> comments = new ArrayList<>();
+        Comment comment = new Comment();
+        comment.setComment("lalal");
+        comments.add(comment);
+        movie.setComments(comments);
+
+        //------
         return movie;
+    }
+
+    private Movie existMovie(String movieName) {
+        Criteria<Movie> criteria = new Criteria<>();
+        criteria.add(Restrictions.eq("name", movieName));
+        return movieRepository.findOne(criteria);
     }
 
     @Override
@@ -98,7 +179,4 @@ public class EightsCrawler implements PageProcessor {
         return site;
     }
 
-    public static void main(String[] args) {
-        Spider.create(new EightsCrawler()).addUrl("http://www.80s.tw/movie/list").thread(2).run();
-    }
 }

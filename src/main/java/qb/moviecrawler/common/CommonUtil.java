@@ -146,7 +146,11 @@ public class CommonUtil {
      * 功能描述：根据xpath查询值
      */
     public final static String getValue(Page page, String xpath) {
-        return page.getHtml().xpath(xpath).get().trim();
+        try {
+            return page.getHtml().xpath(xpath).get().trim();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     /**

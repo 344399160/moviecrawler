@@ -17,12 +17,22 @@ public class MovieController {
     private MovieService movieService;
 
     /**
-     * 功能描述：电影信息爬取
+     * 功能描述：电影信息爬取 - 电影天堂
      * @author qiaobin
      * @param
      */
     @RequestMapping(value = "/grapmovie")
     public void grapMovie() {
         movieService.grapMovieDetail();
+    }
+
+    /**
+     * 功能描述：电影信息爬取 - 80s
+     * @author qiaobin
+     * @param
+     */
+    @RequestMapping(value = "/grap80smovie")
+    public void grap80sMovie() {
+        movieService.grap80sMovieDetail();
     }
 }

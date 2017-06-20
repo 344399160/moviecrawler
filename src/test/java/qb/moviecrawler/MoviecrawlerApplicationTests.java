@@ -11,9 +11,7 @@ import qb.moviecrawler.database.model.DownloadLink;
 import qb.moviecrawler.database.model.Movie;
 import qb.moviecrawler.database.repository.MovieRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = MoviecrawlerApplication.class)
@@ -25,18 +23,18 @@ public class MoviecrawlerApplicationTests {
 
     @Test
     public void test() {
-        Movie movie = new Movie();
-        movie.setId("1");
-        movie.setName("name");
-
-        List<DownloadLink> list = new ArrayList<>();
-        DownloadLink l1 = new DownloadLink();
-        l1.setLink("link");
-        l1.setId("abc");
-//        l1.setMovieId("1");
-        list.add(l1);
-        movie.setLinks(list);
-        movieRepository.save(movie);
+//        Movie movie = new Movie();
+//        movie.setId("1");
+//        movie.setName("name");
+//
+//        Set<DownloadLink> list = new HashSet<>();
+//        DownloadLink l1 = new DownloadLink();
+//        l1.setLink("link");
+//        l1.setId("abc");
+////        l1.setMovieId("1");
+//        list.add(l1);
+//        movie.setLinks(list);
+//        movieRepository.save(movie);
     }
 
 

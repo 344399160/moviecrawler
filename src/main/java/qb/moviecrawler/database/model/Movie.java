@@ -1,12 +1,13 @@
 package qb.moviecrawler.database.model;
 
 import lombok.Data;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 功能：电影实体
@@ -70,7 +71,7 @@ public class Movie implements java.io.Serializable {
      *  评分
      */
     @Column(name="`SCORE`")
-    private double score;
+    private String score;
 
     /**
      *  主演
@@ -118,15 +119,17 @@ public class Movie implements java.io.Serializable {
     /**
      *  下载地址
      */
-    @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
     @JoinColumn(name="MOVIE_ID")
+    @Fetch(FetchMode.SUBSELECT)
     private List<DownloadLink> links;
 
     /**
      *  评论
      */
-    @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
-    @JoinColumn(name="COMMENT_ID")
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    @JoinColumn(name="MOVIE_ID")
+    @Fetch(FetchMode.SUBSELECT)
     private List<Comment> comments;
 
 

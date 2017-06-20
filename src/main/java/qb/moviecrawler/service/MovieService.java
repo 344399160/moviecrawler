@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import qb.moviecrawler.common.*;
 import qb.moviecrawler.crawler.DianYingTianTangCrawler;
+import qb.moviecrawler.crawler.EightsCrawler;
 import qb.moviecrawler.database.model.Agency;
 import qb.moviecrawler.database.model.DownloadLink;
 import qb.moviecrawler.database.model.Movie;
@@ -55,7 +56,6 @@ public class MovieService {
             //爬取结束后, 解析错误日志，将未执行成功url取出重新爬取
             this.reGrapDetailFromLog(logFile, classify);
         }
-
     }
 
     /**
@@ -80,12 +80,36 @@ public class MovieService {
     }
 
     /**
-     * 功能描述：文件复制
+     * 功能描述：爬取80s电影网电影信息
      * @author qiaobin
      * @param
      */
-    private void copyToNewFile(File copyFile, String copyName) {
-        if (copyFile.exists()) {
+    public void grap80sMovieDetail() {
+        String logName = CommonUtil.getLogName();
+        File logFile = new File(logName);
+        Spider.create(new EightsCrawler(movieRepository, downloadLinkRepository, "grap")).addUrl("http://www.80s.tw/movie/list").thread(2).run();
+        //爬取结束后, 解析错误日志，将未执行成功url取出重新爬取
+//        this.reGrap80sDetailFromLog(logFile);
+    }
+
+    /**
+     * 功能描述：解析错误日志中的失败url并重新爬取 - 80s
+     * @author qiaobin
+     * @param
+     */
+    public void reGrap80sDetailFromLog(File logFile) {
+        String[] pages = CommonUtil.parseLog(logFile);
+        logFile.delete();
+        if (null != pages) {
+            HttpClientDownloader httpClientDownloader = this.getDownloader();
+            Spider spider = Spider.create(new EightsCrawler(movieRepository, downloadLinkRepository, "regrap"))
+                    .addUrl(pages);
+            if (null != httpClientDownloader) {
+                spider.setDownloader(httpClientDownloader);
+            }
+            spider.thread(2).run();
+            FileUtil.copyFile(logFile,  "80s.log", true);
+            logFile.delete();
         }
     }
 

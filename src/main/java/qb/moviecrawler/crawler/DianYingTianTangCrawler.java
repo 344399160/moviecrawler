@@ -162,7 +162,7 @@ public class DianYingTianTangCrawler implements PageProcessor {
             String actorRegix = "◎主　　演";
             actor = content.substring(content.indexOf(actorRegix) + actorRegix.length() + 1, content.indexOf("◎简　　介"));
             String[] split = actor.split("<br>");
-            actor = StringUtils.join(split, ";").trim();
+            actor = StringUtils.join(split, ",").trim();
         } catch (Exception e) {
             actor = "";
         }
@@ -183,7 +183,7 @@ public class DianYingTianTangCrawler implements PageProcessor {
                 for (int i = 1; i < imgs.length; i++) {
                     list.add(imgs[i]);
                 }
-                movie.setScreenshotImg(StringUtils.join(list, ";"));
+                movie.setScreenshotImg(StringUtils.join(list, ","));
             } else if (imgs.length == 1){
                 String jianjie = "◎简　　介";
                 String temp = content.substring(content.indexOf(jianjie) + jianjie.length(), content.length());
