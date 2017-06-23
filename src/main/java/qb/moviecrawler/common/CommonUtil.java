@@ -3,10 +3,8 @@ package qb.moviecrawler.common;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import qb.moviecrawler.database.model.Agency;
-import qb.moviecrawler.database.repository.AgencyRepository;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.downloader.HttpClientDownloader;
 import us.codecraft.webmagic.proxy.Proxy;
@@ -143,6 +141,13 @@ public class CommonUtil {
     }
 
     /**
+     * 功能描述：根据xpath查询符合条件列表
+     */
+    public final static String getLink(Page page, String xpath) {
+        return page.getHtml().xpath(xpath).links().get();
+    }
+
+    /**
      * 功能描述：根据xpath查询值
      */
     public final static String getValue(Page page, String xpath) {
@@ -150,6 +155,17 @@ public class CommonUtil {
             return page.getHtml().xpath(xpath).get().trim();
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    /**
+     * 功能描述：根据xpath查询值
+     */
+    public final static List<String> getMatchAllValue(Page page, String xpath) {
+        try {
+            return page.getHtml().xpath(xpath).all();
+        } catch (Exception e) {
+            return null;
         }
     }
 

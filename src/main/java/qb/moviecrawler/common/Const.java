@@ -66,4 +66,5 @@ public class Const {
     public final static String EIGHTS_SCORE_XPATH = "//div[@class='clearfix'][2]/span[1]/text()";  //评分
     public final static String EIGHTS_CONTENT_XPATH = "//div[@id='movie_content']/text()";  //评分
     public final static String EIGHTS_SCREENSHOT_IMG_XPATH = "//div[@class='noborder block1']/img/@src";  //评分
+    public final static String EIGHTS_DOWNLOAD_LINK_XPATH = "//span[@class='xunlei dlbutton1']";  //下载链接
 }

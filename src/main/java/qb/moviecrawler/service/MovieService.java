@@ -50,11 +50,11 @@ public class MovieService {
         File logFile = new File(logName);
         Map<String, String> map = Const.DIANYINGTIANTANG_MAP;
         for (String classify : map.keySet()) {
-            Spider.create(new DianYingTianTangCrawler(movieRepository, downloadLinkRepository, classify, "grap"))
+            Spider.create(new DianYingTianTangCrawler(movieRepository, downloadLinkRepository, "grap"))
                     .addUrl(map.get(classify))
                     .thread(2).run();
             //爬取结束后, 解析错误日志，将未执行成功url取出重新爬取
-            this.reGrapDetailFromLog(logFile, classify);
+            this.reGrapDetailFromLog(logFile);
         }
     }
 
@@ -63,19 +63,17 @@ public class MovieService {
      * @author qiaobin
      * @param
      */
-    public void reGrapDetailFromLog(File logFile, String type) {
+    public void reGrapDetailFromLog(File logFile) {
         String[] pages = CommonUtil.parseLog(logFile);
         logFile.delete();
         if (null != pages) {
             HttpClientDownloader httpClientDownloader = this.getDownloader();
-            Spider spider = Spider.create(new DianYingTianTangCrawler(movieRepository, downloadLinkRepository, type, "regrap"))
+            Spider spider = Spider.create(new DianYingTianTangCrawler(movieRepository, downloadLinkRepository, "regrap"))
                     .addUrl(pages);
             if (null != httpClientDownloader) {
                 spider.setDownloader(httpClientDownloader);
             }
             spider.thread(2).run();
-            FileUtil.copyFile(logFile, type + ".log", true);
-            logFile.delete();
         }
     }
 
@@ -108,8 +106,6 @@ public class MovieService {
                 spider.setDownloader(httpClientDownloader);
             }
             spider.thread(2).run();
-            FileUtil.copyFile(logFile,  "80s.log", true);
-            logFile.delete();
         }
     }
 

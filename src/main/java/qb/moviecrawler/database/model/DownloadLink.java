@@ -2,10 +2,7 @@ package qb.moviecrawler.database.model;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -21,8 +18,14 @@ public class DownloadLink implements java.io.Serializable{
      *  主键
      */
     @Id
-    @Column(name="`ID`", length = 40)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+
+    /**
+     *  标题
+     */
+    @Column(name="`TITLE`", length = 500)
+    private String title;
 
     /**
      *  链接

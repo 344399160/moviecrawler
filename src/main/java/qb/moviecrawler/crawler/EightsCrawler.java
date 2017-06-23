@@ -1,11 +1,10 @@
 package qb.moviecrawler.crawler;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
+import qb.moviecrawler.common.BeanUtil;
 import qb.moviecrawler.common.CommonUtil;
 import qb.moviecrawler.common.Const;
 import qb.moviecrawler.common.UserAgentUtils;
-import qb.moviecrawler.database.model.Comment;
 import qb.moviecrawler.database.model.DownloadLink;
 import qb.moviecrawler.database.model.Movie;
 import qb.moviecrawler.database.repository.DownloadLinkRepository;
@@ -16,7 +15,10 @@ import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -62,33 +64,39 @@ public class EightsCrawler implements PageProcessor {
                 page.addTargetRequests(titleLinks);
             } else { //详情页
                 Movie movie = parseContent(page);
-                Movie savedMoive = this.existMovie(movie.getName());
-                if (null != savedMoive && !CollectionUtils.isEmpty(movie.getLinks())) {   //如果有记录存在， 比较下载链接，如果不存在新链接则保存
-                    List<DownloadLink> oldLinks = savedMoive.getLinks();
-                    List<DownloadLink> links = movie.getLinks();
-                    List<DownloadLink> combineList = new ArrayList<>();
-                    if (CollectionUtils.isEmpty(oldLinks)) {
-                        savedMoive.setLinks(links);
-                        savedMoive.setLastTime(new Date());
-                        movieRepository.save(savedMoive);
-                    }
-                    if (!CollectionUtils.isEmpty(oldLinks)) {
-                        //查询库里相同id记录是否有该link
-                        for (DownloadLink link : links) {
-                            if (downloadLinkRepository.linkExist(link.getLink(), savedMoive.getId()) <= 0) {
-                                combineList.add(link);
-                            }
-                        }
-                        if (combineList.size() > 0) {
-                            combineList.addAll(oldLinks);
-                            savedMoive.setLinks(combineList);
-                            savedMoive.setLastTime(new Date());
-                            movieRepository.save(savedMoive);
-                        }
-                    }
-                } else {
+                Movie savedMovie = this.existMovie(movie.getName());
+                if (null == savedMovie) {
                     movieRepository.save(movie);
+                } else {
+                    Movie newMovie = BeanUtil.combineMovie(savedMovie, movie);
+                    movieRepository.save(newMovie);
                 }
+//                if (null != savedMoive && !CollectionUtils.isEmpty(movie.getLinks())) {   //如果有记录存在， 比较下载链接，如果不存在新链接则保存
+//                    List<DownloadLink> oldLinks = savedMoive.getLinks();
+//                    List<DownloadLink> links = movie.getLinks();
+//                    List<DownloadLink> combineList = new ArrayList<>();
+//                    if (CollectionUtils.isEmpty(oldLinks)) {
+//                        savedMoive.setLinks(links);
+//                        savedMoive.setLastTime(new Date());
+//                        movieRepository.save(savedMoive);
+//                    }
+//                    if (!CollectionUtils.isEmpty(oldLinks)) {
+//                        //查询库里相同id记录是否有该link
+//                        for (DownloadLink link : links) {
+//                            if (downloadLinkRepository.linkExist(link.getLink(), savedMoive.getId()) <= 0) {
+//                                combineList.add(link);
+//                            }
+//                        }
+//                        if (combineList.size() > 0) {
+//                            combineList.addAll(oldLinks);
+//                            savedMoive.setLinks(combineList);
+//                            savedMoive.setLastTime(new Date());
+//                            movieRepository.save(savedMoive);
+//                        }
+//                    }
+//                } else {
+//                    movieRepository.save(movie);
+//                }
             }
         }
     }
@@ -128,6 +136,8 @@ public class EightsCrawler implements PageProcessor {
         String country = StringUtils.join(countryList, "/");
         //内容
         String content = CommonUtil.getValue(page, Const.EIGHTS_CONTENT_XPATH);
+        //下载链接
+        List<String> allMatchLinkContent = CommonUtil.getMatchAllValue(page, Const.EIGHTS_DOWNLOAD_LINK_XPATH);
 
         movie.setFirstTime(new Date());
         movie.setLastTime(new Date());
@@ -146,22 +156,17 @@ public class EightsCrawler implements PageProcessor {
         movie.setCoverImg(coverImg);
         movie.setScreenshotImg(screenShotImg);
         movie.setIntroduce(describe);
-        //------------
-        List<DownloadLink> list = new ArrayList<>();
-        DownloadLink link = new DownloadLink();
-        link.setId(UUID.randomUUID().toString());
-        link.setLink("www.baidu.com");
-        link.setFirstDate(new Date());
-        list.add(link);
+
+        List<DownloadLink> list = new ArrayList<>(allMatchLinkContent.size());
+        for (String linkContent : allMatchLinkContent) {
+            DownloadLink link = new DownloadLink();
+            link.setLink(CommonUtil.readElement(linkContent, "a", "href"));
+            link.setTitle(CommonUtil.readElement(linkContent, "a", "thunderrestitle"));
+            link.setFirstDate(new Date());
+            list.add(link);
+        }
         movie.setLinks(list);
 
-        List<Comment> comments = new ArrayList<>();
-        Comment comment = new Comment();
-        comment.setComment("lalal");
-        comments.add(comment);
-        movie.setComments(comments);
-
-        //------
         return movie;
     }
 

@@ -11,6 +11,9 @@ import qb.moviecrawler.database.model.DownloadLink;
 import qb.moviecrawler.database.model.Movie;
 import qb.moviecrawler.database.repository.MovieRepository;
 
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 @RunWith(SpringRunner.class)
@@ -23,18 +26,15 @@ public class MoviecrawlerApplicationTests {
 
     @Test
     public void test() {
-//        Movie movie = new Movie();
-//        movie.setId("1");
-//        movie.setName("name");
-//
-//        Set<DownloadLink> list = new HashSet<>();
-//        DownloadLink l1 = new DownloadLink();
-//        l1.setLink("link");
-//        l1.setId("abc");
-////        l1.setMovieId("1");
-//        list.add(l1);
-//        movie.setLinks(list);
-//        movieRepository.save(movie);
+        try {
+            URL url = new URL("thunder://QUFodHRwOi8vZGwxMjMuODBzLmltOjkyMC8xNzA2L+eUn2jljbHmnLrvvJpm5LuHL+eUn2jljbHmnLrvvJpm5LuHLm1wNFpa");
+            HttpURLConnection  urlcon=(HttpURLConnection)url.openConnection();
+            int i;
+            i =urlcon.getContentLength();
+            System.out.println(i);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

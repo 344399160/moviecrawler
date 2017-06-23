@@ -1,9 +1,14 @@
 package qb.moviecrawler.common;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
+import qb.moviecrawler.database.model.DownloadLink;
+import qb.moviecrawler.database.model.Movie;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 描述：实体工具类
@@ -122,6 +127,62 @@ public class BeanUtil {
             }
         }
         return combinedMap;
+    }
+
+
+    /**
+     * 功能描述：电影信息补全
+     * @author qiaobin
+     * @date 2016/10/11  16:30
+     * @param savedMovie 被合并对象
+     * @param movie 合并对象
+     */
+    public static Movie combineMovie(Movie savedMovie, Movie movie){
+        try {
+            List<DownloadLink> combineList = new ArrayList<>();
+            //-----------比较下载链接，并生成链接合集
+            if (null != savedMovie && !CollectionUtils.isEmpty(movie.getLinks())) {   //如果有记录存在， 比较下载链接，如果不存在新链接则保存
+                List<DownloadLink> savedLinks = savedMovie.getLinks(); //保存的下载链接
+                List<DownloadLink> newLinks = movie.getLinks();  //新爬取的下载链接
+                if (CollectionUtils.isEmpty(savedLinks)) {  //如果库中没有下载链接
+                    combineList = newLinks;
+                } else { //如果库中有下载链接，那么将新的连接合并进来
+                    for (DownloadLink newLink : newLinks) {
+                        int index = 0;
+                        DownloadLink l = null;
+                        for (DownloadLink savedLink : savedLinks) {
+                            l = newLink;
+                            if (savedLink.getLink().equals(newLink.getLink())) {
+                                index++;
+                                continue;
+                            }
+                        }
+                        if (index == 0) {
+                            combineList.add(l);
+                        }
+                    }
+                    combineList.addAll(savedLinks);
+                }
+            }
+            //-----------对象合并，填补不为空字段
+            Map<String, Object> combinedMap = objectToMap(savedMovie);
+            Map<String, Object> objMap = objectToMap(movie);
+            for (String key : combinedMap.keySet()) {
+                try {
+                    if (!StringUtils.isNotEmpty(combinedMap.get(key).toString()) && (!key.equals("links")) && (!key.equals("comments")) && StringUtils.isNotEmpty(objMap.get(key).toString())) {
+                        combinedMap.put(key, objMap.get(key));
+                    }
+                } catch (Exception e) {
+                }
+            }
+            Movie newMovie = (Movie)BeanUtil.mapToObject(combinedMap, Movie.class);
+            newMovie.setLinks(combineList);
+            newMovie.setLastTime(new Date());
+            return newMovie;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
